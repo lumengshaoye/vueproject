@@ -2,9 +2,9 @@
 	<div>
 		<h2>发表评论</h2>
 		<hr />
-		<textarea placeholder="请输入要BB的内容(最多BB的内容为120字)" maxlength="120"></textarea>
-		<mt-button type="primary" size="large">发表评论</mt-button>
-		<div class="cmt_container" v-for="(item,index) in comments" :key="item.add_time">
+		<textarea placeholder="请输入要BB的内容(最多BB的内容为120字)" maxlength="120" v-model="message"></textarea>
+		<mt-button type="primary" size="large" @click="postComment">发表评论</mt-button>
+		<div class="cmt_container" v-for="(item,index) in comments" :key="index">
 		  <div class="cmt_user">
 			  第{{index+1}}楼：&nbsp;&nbsp;用户:{{item.user_name}}&nbsp;&nbsp;发表时间:{{item.add_time | dateFormat}}
 		  </div>
@@ -18,12 +18,13 @@
 
 <script>
 	import {request} from '../network/index.js'
-	
+	import axios from 'axios'
 	export default{
 		data(){
 			return {
 				pageIndex:1,
-				comments:[]
+				comments:[],
+				message:''
 			}
 		},
 		created(){
@@ -42,12 +43,23 @@
 					//console.log(res.data.message)
 					this.comments = this.comments.concat(res.data.message)
 				})
+			},
+			postComment(){
+				if(this.message.trim().length===0){
+					return 
+				}
+				axios.post('http://www.liulongbin.top:3005/api/postcomment/'+this.$route.params.id,{content:this.message.trim()})
+				.then(res=>{
+					const comment = {user_name:"匿名用户",add_time:new Date(),content:this.message.trim()}
+					this.comments.unshift(comment)
+					this.message=''
+				})
 			}
 		}
 	}
 </script>
 
-<style>
+<style scoped>
 	textarea{
 		margin: 0 !important;
 	}
