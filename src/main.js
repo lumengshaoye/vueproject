@@ -6,6 +6,8 @@ Vue.use(vueRouter)
 import MintUI from 'mint-ui'
 Vue.use(MintUI)
 
+import VuePreview from 'vue2-preview'
+Vue.use(VuePreview)
 
 import router from './router/index.js'
 import App from './App.vue'

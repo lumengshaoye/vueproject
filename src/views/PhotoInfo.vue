@@ -8,7 +8,17 @@
 		 <hr /> 
 		 
 		 <!-- 缩略图区域 -->
-		 
+		 <div class="thumbs">
+		     <vue-preview
+		       :list="list"
+		       :thumbImageStyle="{width: '100px', height: '100px', margin: '10px'}"
+		       :previewBoxStyle="{border: '1px solid #eee'}"
+		       :tapToClose="true"
+		       @close="closeHandler"
+		       @destroy="destroyHandler"
+		     />
+		   </div>
+		   
 		 <!-- 图片内容区域 -->
 		 <div class="content" v-html="photoInfo.content"></div>
 		 <comment :id="this.id"></comment>
@@ -22,11 +32,13 @@
 		data(){
 			return {
 				id:this.$route.params.id,
-				photoInfo:{}
+				photoInfo:{},
+				list:[]
 			}
 		},
 		created(){
 			this.getPhotoInfo()
+			this.getThumbs()
 		},
 		methods:{
 			getPhotoInfo(){
@@ -34,6 +46,24 @@
 				.then(res=>{
 					this.photoInfo = res.data.message[0]
 				})	
+			},
+			getThumbs(){
+				request('/api/getthumimages/'+this.id)
+				.then(res=>{
+					res.data.message.forEach(item=>{
+						item.w=800
+						item.h=800
+					})
+					this.list = res.data.message
+				})
+			},
+		    // 即将关闭的时候，调用这个处理函数
+			closeHandler() {
+			  console.log('closeHandler')
+			},
+			// 完全关闭之后，调用这个函数清理资源
+			destroyHandler() {
+			  console.log('destroyHandler')
 			}
 		},
 		components:{
